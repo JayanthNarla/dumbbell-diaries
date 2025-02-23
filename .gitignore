@@ -1,0 +1,68 @@
+# Backend
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+*.log
+*.sqlite3
+poetry.lock
+
+# Frontend
+node_modules/
+.expo/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+.DS_Store
+*.pem
+.env*.local
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# MongoDB
+data/db/
+
+# Elastic Search
+elasticsearch-data/
+
+# Media Storage
+uploads/
+media/
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+tmp/
+temp/ 
