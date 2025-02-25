@@ -36,53 +36,6 @@ router = APIRouter()
 @router.post("/", response_model=Workout)
 async def create_workout_endpoint(
 =======
-# Mock database functions - would be replaced with actual MongoDB operations
-async def create_workout_db(workout: WorkoutCreate, user_id: str) -> Workout:
-    """Create a workout in the database."""
-    # This would be replaced with actual DB call
-    workout_id = str(ObjectId())
-    return Workout(
-        id=workout_id,
-        user_id=user_id,
-        **workout.dict(),
-        created_at=None,
-        date=None,
-        is_public=False,
-        likes_count=0,
-        comments_count=0
-    )
-
-
-async def get_workout_by_id_db(workout_id: str) -> Optional[Workout]:
-    """Get a workout by ID from the database."""
-    # This would be replaced with actual DB call
-    return None
-
-
-async def update_workout_db(workout_id: str, workout_update: WorkoutUpdate) -> Optional[Workout]:
-    """Update a workout in the database."""
-    # This would be replaced with actual DB call
-    return None
-
-
-async def delete_workout_db(workout_id: str) -> bool:
-    """Delete a workout from the database."""
-    # This would be replaced with actual DB call
-    return True
-
-
-async def get_user_workouts_db(user_id: str, skip: int = 0, limit: int = 100) -> List[Workout]:
-    """Get a user's workouts from the database."""
-    # This would be replaced with actual DB call
-    return []
-
-
-async def get_public_workouts_db(skip: int = 0, limit: int = 100) -> List[WorkoutWithUserInfo]:
-    """Get public workouts from the database."""
-    # This would be replaced with actual DB call
-    return []
-
-
 @router.post("/", response_model=Workout)
 async def create_workout(
 >>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec

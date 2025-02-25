@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
     
     # Elasticsearch Settings
-    ELASTICSEARCH_URI: str = Field(..., env="ELASTICSEARCH_URI")
+    # ELASTICSEARCH_URI: str = Field(..., env="ELASTICSEARCH_URI")
     
     # Firebase Settings
     FIREBASE_CREDENTIALS: str = Field(..., env="FIREBASE_CREDENTIALS")

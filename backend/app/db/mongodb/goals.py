@@ -63,7 +63,7 @@ async def create_goal(goal: GoalCreate, user_id: str) -> GoalInDB:
     goal_in_db.id = result.inserted_id
     
     # Index in Elasticsearch
-    await sync_goal(goal_in_db.dict(by_alias=True))
+    # await sync_goal(goal_in_db.dict(by_alias=True))
     
     return goal_in_db
 
@@ -165,8 +165,8 @@ async def update_goal(goal_id: str, goal_update: GoalUpdate) -> Optional[GoalInD
         updated_goal = await get_goal_by_id(goal_id)
         
         # Update in Elasticsearch
-        if updated_goal:
-            await sync_goal(updated_goal.dict(by_alias=True), operation="update")
+        # if updated_goal:
+        #     await sync_goal(updated_goal.dict(by_alias=True), operation="update")
             
         return updated_goal
     
@@ -188,8 +188,8 @@ async def delete_goal(goal_id: str) -> bool:
     result = await db.goals.delete_one({"_id": ObjectId(goal_id)})
     
     # Delete from Elasticsearch
-    if result.deleted_count:
-        await sync_goal({"_id": goal_id}, operation="delete")
+    # if result.deleted_count:
+    #     await sync_goal({"_id": goal_id}, operation="delete")
         
     return result.deleted_count > 0
 
@@ -297,8 +297,8 @@ async def update_goal_progress(goal_id: str, current_value: float) -> Optional[G
         updated_goal = await get_goal_by_id(goal_id)
         
         # Update in Elasticsearch
-        if updated_goal:
-            await sync_goal(updated_goal.dict(by_alias=True), operation="update")
+        # if updated_goal:
+        #     await sync_goal(updated_goal.dict(by_alias=True), operation="update")
             
         return updated_goal
     
