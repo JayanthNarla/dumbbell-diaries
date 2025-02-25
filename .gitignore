@@ -66,3 +66,4 @@ media/
 .env.production.local
 tmp/
 temp/ 
+backend/prompt.md
