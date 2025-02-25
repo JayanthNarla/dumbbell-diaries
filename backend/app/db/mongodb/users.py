@@ -53,6 +53,7 @@ async def get_user_by_username(username: str) -> Optional[UserInDB]:
     """
     db = await get_database()
     user_data = await db.users.find_one({"username": username})
+    print(user_data)
     if user_data:
         return UserInDB(**user_data)
     return None
@@ -60,7 +61,7 @@ async def get_user_by_username(username: str) -> Optional[UserInDB]:
 
 async def create_user(user: UserCreate) -> UserInDB:
     """
-    Create a new user.
+    Create a new user with MongoDB-generated ID.
     
     Args:
         user: User data
@@ -70,18 +71,29 @@ async def create_user(user: UserCreate) -> UserInDB:
     """
     db = await get_database()
     
-    user_in_db = UserInDB(
+    # Prepare user data WITHOUT explicitly setting _id
+    user_data = {
         **user.dict(exclude={"password"}),
-        hashed_password=get_password_hash(user.password),
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        "hashed_password": get_password_hash(user.password),
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    # Let MongoDB generate the ObjectId automatically
+    result = await db.users.insert_one(user_data)
+    
+    # Create UserInDB with the generated ID
+    # user_in_db = UserInDB(
+    #     _id=str(result.inserted_id),  # Convert ObjectId to string
+    #     **user_data
+    # )
+
+    return UserInDB(
+         # Use alias mapping
+        **user_data
     )
     
-    result = await db.users.insert_one(user_in_db.dict(by_alias=True))
-    user_in_db.id = result.inserted_id
     
-    return user_in_db
-
 
 async def update_user(user_id: str, user_update: UserUpdate) -> Optional[UserInDB]:
     """

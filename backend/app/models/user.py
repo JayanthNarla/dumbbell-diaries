@@ -1,20 +1,8 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
-from bson import ObjectId
-
-
-class PyObjectId(str):
-    """Custom type for handling MongoDB ObjectId."""
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return str(v)
+from app.models.mongodb import PyObjectId, MongoBaseModel
+from pydantic import ConfigDict
 
 
 class UserBase(BaseModel):
@@ -25,6 +13,7 @@ class UserBase(BaseModel):
     
     class Config:
         populate_by_name = True
+        from_attributes=True
 
 
 class UserCreate(UserBase):
@@ -42,14 +31,14 @@ class UserUpdate(BaseModel):
     bio: Optional[str] = None
 
 
-class UserInDB(UserBase):
+class UserInDB(UserBase, MongoBaseModel):
     """User model as stored in the database"""
-    id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
     hashed_password: str
     is_active: bool = True
-    is_admin: bool = False
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_superuser: bool = False
+    created_at: datetime
+    updated_at: datetime
     profile_picture: Optional[str] = None
     bio: Optional[str] = None
     following: List[PyObjectId] = []
@@ -57,7 +46,7 @@ class UserInDB(UserBase):
     
     class Config:
         json_encoders = {
-            ObjectId: str
+            PyObjectId: str
         }
 
 
@@ -72,8 +61,9 @@ class User(UserBase):
     following_count: int = 0
     followers_count: int = 0
     
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(
+        from_attributes=True
+    )
 
 
 class UserWithToken(User):

@@ -54,9 +54,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
     return UserWithToken(
         **User.from_orm(user).dict(),
         access_token=access_token,
-        token_type="bearer",
-        following_count=len(user.following),
-        followers_count=len(user.followers)
+        token_type="bearer"
+  
     )
 
 
@@ -98,9 +97,7 @@ async def register(user_create: UserCreate) -> Any:
     return UserWithToken(
         **User.from_orm(user_in_db).dict(),
         access_token=access_token,
-        token_type="bearer",
-        following_count=0,
-        followers_count=0
+        token_type="bearer"
     )
 
 
