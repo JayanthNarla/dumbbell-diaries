@@ -4,7 +4,7 @@ from bson import ObjectId
 
 from app.models.social import PostCreate, PostUpdate, PostInDB, CommentCreate, CommentInDB
 from app.db.mongodb.mongodb import get_database
-from app.db.elasticsearch.sync import sync_post
+from app.db.mongodb.search import sync_post
 
 
 async def create_post(post: PostCreate, user_id: str) -> PostInDB:

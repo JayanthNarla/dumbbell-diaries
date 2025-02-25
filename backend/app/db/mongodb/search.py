@@ -227,4 +227,90 @@ class MongoDBSearchService:
             "workouts": workouts["results"],
             "users": users["results"],
             "food_logs": food_logs["results"]
-        } 
+        }
+
+async def sync_post(post_data: Dict[str, Any], operation: str = "index") -> None:
+    """
+    No longer needed - Atlas Search indexes MongoDB collections automatically
+    This is kept for compatibility with existing code
+    """
+    pass  # Atlas Search indexes MongoDB collections automatically
+
+async def search_content(
+    query: str, 
+    collection_name: str = "posts",
+    limit: int = 20, 
+    skip: int = 0
+) -> List[Dict[str, Any]]:
+    """
+    Search across collections using MongoDB Atlas Search.
+    
+    Args:
+        query: Search query string
+        collection_name: Collection to search ("posts", "food_logs", "workouts", "users")
+        limit: Maximum number of results to return
+        skip: Number of results to skip
+        
+    Returns:
+        List of matching documents
+    """
+    db = await get_database()
+    
+    # Atlas Search query using $search aggregation stage
+    pipeline = [
+        {
+            "$search": {
+                "index": collection_name,  # Use the index you created in Atlas
+                "text": {
+                    "query": query,
+                    "path": {"wildcard": "*"},  # Search all fields
+                    "fuzzy": {}  # Enable fuzzy matching
+                }
+            }
+        },
+        {"$skip": skip},
+        {"$limit": limit}
+    ]
+    
+    # Add lookup for user info if searching posts
+    if collection_name == "posts":
+        pipeline.extend([
+            {
+                "$lookup": {
+                    "from": "users",
+                    "localField": "user_id",
+                    "foreignField": "_id",
+                    "as": "user"
+                }
+            },
+            {"$unwind": "$user"},
+            {
+                "$project": {
+                    "_id": 1,
+                    "user_id": 1,
+                    "content": 1,
+                    "media_urls": 1,
+                    "created_at": 1,
+                    "updated_at": 1,
+                    "likes_count": 1,
+                    "comments_count": 1,
+                    "user_name": "$user.username",
+                    "user_profile_picture": "$user.profile_picture",
+                    "score": {"$meta": "searchScore"}
+                }
+            }
+        ])
+    
+    # Execute search
+    results = []
+    cursor = db[collection_name].aggregate(pipeline)
+    
+    async for doc in cursor:
+        # Convert ObjectIds to strings for JSON serialization
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        if "user_id" in doc:
+            doc["user_id"] = str(doc["user_id"])
+        results.append(doc)
+    
+    return results 

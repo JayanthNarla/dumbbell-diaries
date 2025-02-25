@@ -227,7 +227,9 @@ async def sync_social_post(post: Dict[str, Any], operation: str = "index") -> No
             await update_document(SOCIAL_POST_INDEX, doc_id, es_doc)
         else:
             await index_document(SOCIAL_POST_INDEX, doc_id, es_doc)
-            
+async def sync_post() -> Dict[str, int]:
+    return 
+
 
 async def sync_all_data() -> Dict[str, int]:
     """
