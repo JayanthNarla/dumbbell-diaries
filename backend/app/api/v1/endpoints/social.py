@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
+=======
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 from typing import Any, List, Optional, Dict
 
 from fastapi import APIRouter, Depends, HTTPException, Body, Query, status
@@ -9,6 +12,7 @@ from datetime import datetime
 from app.core.security import get_current_active_user
 from app.models.user import User
 from app.models.workout import WorkoutWithUserInfo
+<<<<<<< HEAD
 from app.db.mongodb.social import (
     create_post,
     get_post_by_id,
@@ -23,6 +27,8 @@ from app.db.mongodb.social import (
     follow_user as follow_user_db,
     unfollow_user as unfollow_user_db
 )
+=======
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 
 
 router = APIRouter()
@@ -54,8 +60,90 @@ class Comment:
     likes_count: int
 
 
+<<<<<<< HEAD
 @router.get("/feed", response_model=List[Dict])
 async def get_social_feed_endpoint(
+=======
+# Mock database functions
+async def get_social_feed_db(
+    user_id: str,
+    feed_type: str = "following",  # "following", "discover"
+    skip: int = 0,
+    limit: int = 20
+) -> List[Dict]:
+    """Get user's social feed."""
+    # This would be replaced with actual DB call
+    return []
+
+
+async def create_post_db(
+    user_id: str,
+    content: str,
+    media_urls: Optional[List[str]] = None,
+    workout_id: Optional[str] = None
+) -> Dict:
+    """Create a social post."""
+    # This would be replaced with actual DB call
+    post_id = str(ObjectId())
+    return {
+        "id": post_id,
+        "user_id": user_id,
+        "content": content,
+        "media_urls": media_urls or [],
+        "created_at": datetime.utcnow(),
+        "likes_count": 0,
+        "comments_count": 0,
+        "workout_id": workout_id
+    }
+
+
+async def get_post_by_id_db(post_id: str) -> Optional[Dict]:
+    """Get a post by ID."""
+    # This would be replaced with actual DB call
+    return None
+
+
+async def delete_post_db(post_id: str) -> bool:
+    """Delete a post."""
+    # This would be replaced with actual DB call
+    return True
+
+
+async def like_post_db(post_id: str, user_id: str) -> Dict:
+    """Like a post."""
+    # This would be replaced with actual DB call
+    return {"likes_count": 1}
+
+
+async def unlike_post_db(post_id: str, user_id: str) -> Dict:
+    """Unlike a post."""
+    # This would be replaced with actual DB call
+    return {"likes_count": 0}
+
+
+async def add_comment_db(post_id: str, user_id: str, content: str) -> Dict:
+    """Add a comment to a post."""
+    # This would be replaced with actual DB call
+    comment_id = str(ObjectId())
+    return {
+        "id": comment_id,
+        "post_id": post_id,
+        "user_id": user_id,
+        "content": content,
+        "created_at": datetime.utcnow(),
+        "likes_count": 0
+    }
+
+
+async def get_post_comments_db(post_id: str, skip: int = 0, limit: int = 50) -> List[Dict]:
+    """Get comments for a post."""
+    # This would be replaced with actual DB call
+    return []
+
+
+@router.get("/feed", response_model=List[Dict])
+async def get_social_feed(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     feed_type: str = "following",
     skip: int = 0,
     limit: int = 20,
@@ -73,11 +161,19 @@ async def get_social_feed_endpoint(
     Returns:
         List of social posts
     """
+<<<<<<< HEAD
     return await get_social_feed(str(current_user.id), feed_type, skip, limit)
 
 
 @router.post("/posts", response_model=Dict)
 async def create_post_endpoint(
+=======
+    return await get_social_feed_db(str(current_user.id), feed_type, skip, limit)
+
+
+@router.post("/posts", response_model=Dict)
+async def create_post(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     content: str = Body(..., embed=True),
     media_urls: Optional[List[str]] = Body(None, embed=True),
     workout_id: Optional[str] = Body(None, embed=True),
@@ -95,6 +191,7 @@ async def create_post_endpoint(
     Returns:
         Created post
     """
+<<<<<<< HEAD
     return await create_post(
         {
             "user_id": str(current_user.id),
@@ -108,6 +205,13 @@ async def create_post_endpoint(
 
 @router.get("/posts/{post_id}", response_model=Dict)
 async def get_post_endpoint(
+=======
+    return await create_post_db(str(current_user.id), content, media_urls, workout_id)
+
+
+@router.get("/posts/{post_id}", response_model=Dict)
+async def get_post(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     post_id: str,
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
@@ -121,7 +225,11 @@ async def get_post_endpoint(
     Returns:
         Post
     """
+<<<<<<< HEAD
     post = await get_post_by_id(post_id)
+=======
+    post = await get_post_by_id_db(post_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -132,7 +240,11 @@ async def get_post_endpoint(
 
 
 @router.delete("/posts/{post_id}", response_model=bool)
+<<<<<<< HEAD
 async def delete_post_endpoint(
+=======
+async def delete_post(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     post_id: str,
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
@@ -146,7 +258,11 @@ async def delete_post_endpoint(
     Returns:
         True if post was deleted
     """
+<<<<<<< HEAD
     post = await get_post_by_id(post_id)
+=======
+    post = await get_post_by_id_db(post_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -154,18 +270,30 @@ async def delete_post_endpoint(
         )
     
     # Check if the post belongs to the current user
+<<<<<<< HEAD
     if str(post.user_id) != str(current_user.id):
+=======
+    if post["user_id"] != str(current_user.id):
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions",
         )
     
+<<<<<<< HEAD
     result = await delete_post(post_id)
+=======
+    result = await delete_post_db(post_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     return result
 
 
 @router.post("/posts/{post_id}/like", response_model=Dict)
+<<<<<<< HEAD
 async def like_post_endpoint(
+=======
+async def like_post(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     post_id: str,
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
@@ -177,15 +305,22 @@ async def like_post_endpoint(
         current_user: Current authenticated user
         
     Returns:
+<<<<<<< HEAD
         Updated post with like count
     """
     post = await get_post_by_id(post_id)
+=======
+        Post like count
+    """
+    post = await get_post_by_id_db(post_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Post not found",
         )
     
+<<<<<<< HEAD
     updated_post = await like_post_db(post_id, str(current_user.id))
     if not updated_post:
         raise HTTPException(
@@ -198,6 +333,14 @@ async def like_post_endpoint(
 
 @router.post("/posts/{post_id}/unlike", response_model=Dict)
 async def unlike_post_endpoint(
+=======
+    result = await like_post_db(post_id, str(current_user.id))
+    return result
+
+
+@router.post("/posts/{post_id}/unlike", response_model=Dict)
+async def unlike_post(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     post_id: str,
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
@@ -209,15 +352,22 @@ async def unlike_post_endpoint(
         current_user: Current authenticated user
         
     Returns:
+<<<<<<< HEAD
         Updated post with like count
     """
     post = await get_post_by_id(post_id)
+=======
+        Post like count
+    """
+    post = await get_post_by_id_db(post_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Post not found",
         )
     
+<<<<<<< HEAD
     updated_post = await unlike_post_db(post_id, str(current_user.id))
     if not updated_post:
         raise HTTPException(
@@ -230,6 +380,14 @@ async def unlike_post_endpoint(
 
 @router.post("/posts/{post_id}/comments", response_model=Dict)
 async def add_comment_endpoint(
+=======
+    result = await unlike_post_db(post_id, str(current_user.id))
+    return result
+
+
+@router.post("/posts/{post_id}/comments", response_model=Dict)
+async def add_comment(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     post_id: str,
     content: str = Body(..., embed=True),
     current_user: User = Depends(get_current_active_user)
@@ -243,15 +401,22 @@ async def add_comment_endpoint(
         current_user: Current authenticated user
         
     Returns:
+<<<<<<< HEAD
         Added comment
     """
     post = await get_post_by_id(post_id)
+=======
+        Created comment
+    """
+    post = await get_post_by_id_db(post_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Post not found",
         )
     
+<<<<<<< HEAD
     comment = await add_comment(
         post_id, 
         {"content": content},
@@ -269,6 +434,14 @@ async def add_comment_endpoint(
 
 @router.get("/posts/{post_id}/comments", response_model=List[Dict])
 async def get_comments_endpoint(
+=======
+    result = await add_comment_db(post_id, str(current_user.id), content)
+    return result
+
+
+@router.get("/posts/{post_id}/comments", response_model=List[Dict])
+async def get_comments(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     post_id: str,
     skip: int = 0,
     limit: int = 50,
@@ -286,13 +459,18 @@ async def get_comments_endpoint(
     Returns:
         List of comments
     """
+<<<<<<< HEAD
     post = await get_post_by_id(post_id)
+=======
+    post = await get_post_by_id_db(post_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Post not found",
         )
     
+<<<<<<< HEAD
     return await get_comments(post_id, skip, limit)
 
 
@@ -400,6 +578,9 @@ async def unfollow_user_endpoint(
         )
     
     return result
+=======
+    return await get_post_comments_db(post_id, skip, limit)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 
 
 @router.get("/workouts/trending", response_model=List[WorkoutWithUserInfo])
@@ -421,4 +602,7 @@ async def get_trending_workouts(
     """
     # This would be replaced with actual DB call
     return []
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec

@@ -66,4 +66,10 @@ media/
 .env.production.local
 tmp/
 temp/ 
+<<<<<<< HEAD
 backend/prompt.md
+=======
+
+#prompt.md
+prompt.md
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec

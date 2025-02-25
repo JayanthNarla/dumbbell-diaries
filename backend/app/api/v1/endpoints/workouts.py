@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
+=======
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 from typing import Any, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -9,6 +12,7 @@ from app.core.security import get_current_active_user
 from app.models.user import User
 from app.models.workout import Workout, WorkoutCreate, WorkoutUpdate, WorkoutWithUserInfo
 from app.agents.workout_planner import WorkoutRecommendationRequest, WorkoutPlan, generate_workout_plan
+<<<<<<< HEAD
 from app.db.mongodb.workouts import (
     create_workout,
     get_workout_by_id,
@@ -21,13 +25,67 @@ from app.db.mongodb.workouts import (
     add_comment_to_workout,
     get_workout_comments
 )
+=======
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 
 
 router = APIRouter()
 
 
+<<<<<<< HEAD
 @router.post("/", response_model=Workout)
 async def create_workout_endpoint(
+=======
+# Mock database functions - would be replaced with actual MongoDB operations
+async def create_workout_db(workout: WorkoutCreate, user_id: str) -> Workout:
+    """Create a workout in the database."""
+    # This would be replaced with actual DB call
+    workout_id = str(ObjectId())
+    return Workout(
+        id=workout_id,
+        user_id=user_id,
+        **workout.dict(),
+        created_at=None,
+        date=None,
+        is_public=False,
+        likes_count=0,
+        comments_count=0
+    )
+
+
+async def get_workout_by_id_db(workout_id: str) -> Optional[Workout]:
+    """Get a workout by ID from the database."""
+    # This would be replaced with actual DB call
+    return None
+
+
+async def update_workout_db(workout_id: str, workout_update: WorkoutUpdate) -> Optional[Workout]:
+    """Update a workout in the database."""
+    # This would be replaced with actual DB call
+    return None
+
+
+async def delete_workout_db(workout_id: str) -> bool:
+    """Delete a workout from the database."""
+    # This would be replaced with actual DB call
+    return True
+
+
+async def get_user_workouts_db(user_id: str, skip: int = 0, limit: int = 100) -> List[Workout]:
+    """Get a user's workouts from the database."""
+    # This would be replaced with actual DB call
+    return []
+
+
+async def get_public_workouts_db(skip: int = 0, limit: int = 100) -> List[WorkoutWithUserInfo]:
+    """Get public workouts from the database."""
+    # This would be replaced with actual DB call
+    return []
+
+
+@router.post("/", response_model=Workout)
+async def create_workout(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     workout: WorkoutCreate,
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
@@ -41,7 +99,11 @@ async def create_workout_endpoint(
     Returns:
         Created workout
     """
+<<<<<<< HEAD
     return await create_workout(workout, str(current_user.id))
+=======
+    return await create_workout_db(workout, str(current_user.id))
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 
 
 @router.get("/{workout_id}", response_model=Workout)
@@ -59,7 +121,11 @@ async def read_workout(
     Returns:
         Workout
     """
+<<<<<<< HEAD
     workout = await get_workout_by_id(workout_id)
+=======
+    workout = await get_workout_by_id_db(workout_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not workout:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -67,7 +133,11 @@ async def read_workout(
         )
     
     # Check if the workout belongs to the current user
+<<<<<<< HEAD
     if str(workout.user_id) != str(current_user.id) and not workout.is_public:
+=======
+    if workout.user_id != str(current_user.id) and not workout.is_public:
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions",
@@ -77,7 +147,11 @@ async def read_workout(
 
 
 @router.put("/{workout_id}", response_model=Workout)
+<<<<<<< HEAD
 async def update_workout_endpoint(
+=======
+async def update_workout(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     workout_id: str,
     workout_update: WorkoutUpdate,
     current_user: User = Depends(get_current_active_user)
@@ -93,7 +167,11 @@ async def update_workout_endpoint(
     Returns:
         Updated workout
     """
+<<<<<<< HEAD
     workout = await get_workout_by_id(workout_id)
+=======
+    workout = await get_workout_by_id_db(workout_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not workout:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -101,18 +179,30 @@ async def update_workout_endpoint(
         )
     
     # Check if the workout belongs to the current user
+<<<<<<< HEAD
     if str(workout.user_id) != str(current_user.id):
+=======
+    if workout.user_id != str(current_user.id):
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions",
         )
     
+<<<<<<< HEAD
     updated_workout = await update_workout(workout_id, workout_update)
+=======
+    updated_workout = await update_workout_db(workout_id, workout_update)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     return updated_workout
 
 
 @router.delete("/{workout_id}", response_model=bool)
+<<<<<<< HEAD
 async def delete_workout_endpoint(
+=======
+async def delete_workout(
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     workout_id: str,
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
@@ -126,7 +216,11 @@ async def delete_workout_endpoint(
     Returns:
         True if workout was deleted
     """
+<<<<<<< HEAD
     workout = await get_workout_by_id(workout_id)
+=======
+    workout = await get_workout_by_id_db(workout_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     if not workout:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -134,13 +228,21 @@ async def delete_workout_endpoint(
         )
     
     # Check if the workout belongs to the current user
+<<<<<<< HEAD
     if str(workout.user_id) != str(current_user.id):
+=======
+    if workout.user_id != str(current_user.id):
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions",
         )
     
+<<<<<<< HEAD
     result = await delete_workout(workout_id)
+=======
+    result = await delete_workout_db(workout_id)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
     return result
 
 
@@ -161,7 +263,11 @@ async def read_user_workouts(
     Returns:
         List of workouts
     """
+<<<<<<< HEAD
     return await get_user_workouts(str(current_user.id), skip=skip, limit=limit)
+=======
+    return await get_user_workouts_db(str(current_user.id), skip=skip, limit=limit)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 
 
 @router.get("/user/{user_id}", response_model=List[Workout])
@@ -185,7 +291,11 @@ async def read_user_workouts_by_id(
     """
     # In a real implementation, we would check if the current user follows the requested user
     # or if the workouts are public
+<<<<<<< HEAD
     return await get_user_workouts(user_id, skip=skip, limit=limit)
+=======
+    return await get_user_workouts_db(user_id, skip=skip, limit=limit)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 
 
 @router.get("/public", response_model=List[WorkoutWithUserInfo])
@@ -205,7 +315,11 @@ async def read_public_workouts(
     Returns:
         List of workouts with user info
     """
+<<<<<<< HEAD
     return await get_public_workouts(skip=skip, limit=limit)
+=======
+    return await get_public_workouts_db(skip=skip, limit=limit)
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
 
 
 @router.post("/recommendations", response_model=WorkoutPlan)
@@ -235,6 +349,7 @@ async def get_workout_recommendations(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate workout plan: {str(e)}",
         )
+<<<<<<< HEAD
 
 
 @router.post("/{workout_id}/like", response_model=Workout)
@@ -359,3 +474,5 @@ async def get_comments_endpoint(
     
     return await get_workout_comments(workout_id)
 >>>>>>> Stashed changes
+=======
+>>>>>>> 2d5688bfff6c12d6a7862ab2fa1a8d3da8aab2ec
