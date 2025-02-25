@@ -66,3 +66,6 @@ media/
 .env.production.local
 tmp/
 temp/ 
+
+#prompt.md
+prompt.md
