@@ -17,8 +17,13 @@ def validate_object_id(v: Any) -> ObjectId:
         return None
     raise ValueError(f"Cannot convert {v} to ObjectId")
 
+
+
 # Type for ObjectId fields (Pydantic v2 style)
 PyObjectId = Annotated[str, BeforeValidator(validate_object_id)]
+
+
+
 
 # Base class for MongoDB models
 class MongoBaseModel:

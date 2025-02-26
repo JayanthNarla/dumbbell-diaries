@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Dict
 from fastapi import APIRouter, Depends, HTTPException, Body, Query, status
 from bson import ObjectId
 from datetime import datetime
-
+from app.models.social import PostCreate
 from app.core.security import get_current_active_user
 from app.models.user import User
 from app.models.workout import WorkoutWithUserInfo
@@ -74,35 +74,46 @@ async def get_social_feed_endpoint(
     """
     return await get_social_feed(str(current_user.id), feed_type, skip, limit)
 
-
 @router.post("/posts", response_model=Dict)
 async def create_post_endpoint(
-    content: str = Body(..., embed=True),
-    media_urls: Optional[List[str]] = Body(None, embed=True),
-    workout_id: Optional[str] = Body(None, embed=True),
+    post_data: Dict = Body(...),
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
-    """
-    Create a new social post.
+    # Validate input using PostCreate model
+    post_create = PostCreate(**post_data)
     
-    Args:
-        content: Post content
-        media_urls: Optional list of media URLs
-        workout_id: Optional reference to a workout
-        current_user: Current authenticated user
-        
-    Returns:
-        Created post
-    """
     return await create_post(
-        {
-            "user_id": str(current_user.id),
-            "content": content,
-            "media_urls": media_urls,
-            "workout_id": workout_id
-        },
-        str(current_user.id)
+        post_create,
+        user_id=(current_user.id)
     )
+# @router.post("/posts", response_model=Dict)
+# async def create_post_endpoint(
+#     content: str = Body(..., embed=True),
+#     media_urls: Optional[List[str]] = Body(None, embed=True),
+#     workout_id: Optional[str] = Body(None, embed=True),
+#     current_user: User = Depends(get_current_active_user)
+# ) -> Any:
+#     """
+#     Create a new social post.
+    
+#     Args:
+#         content: Post content
+#         media_urls: Optional list of media URLs
+#         workout_id: Optional reference to a workout
+#         current_user: Current authenticated user
+        
+#     Returns:
+#         Created post
+#     """
+#     return await create_post(
+#         {
+#             "user_id": str(current_user.id),
+#             "content": content,
+#             "media_urls": media_urls,
+#             "workout_id": workout_id
+#         },
+#         str(current_user.id)
+#     )
 
 
 @router.get("/posts/{post_id}", response_model=Dict)

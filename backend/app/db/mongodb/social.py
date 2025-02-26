@@ -7,37 +7,72 @@ from app.db.mongodb.mongodb import get_database
 from app.db.mongodb.search import sync_post
 
 
-async def create_post(post: PostCreate, user_id: str) -> PostInDB:
-    """
-    Create a new social post.
+# async def create_post(post: PostCreate, user_id: str) -> PostInDB:
+#     """
+#     Create a new social post.
     
-    Args:
-        post: Post data
-        user_id: User ID
+#     Args:
+#         post: Post data
+#         user_id: User ID
         
-    Returns:
-        Created post
-    """
+#     Returns:
+#         Created post
+#     """
+#     db = await get_database()
+    
+#     post_in_db = PostInDB(
+#         **post,
+#         user_id=ObjectId(user_id),
+#         created_at=datetime.utcnow(),
+#         updated_at=datetime.utcnow(),
+#         likes=[],
+#         comments=[],
+#         likes_count=0,
+#         comments_count=0
+#     )
+    
+#     result = await db.posts.insert_one(post_in_db.dict(by_alias=True))
+#     post_in_db.id = result.inserted_id
+    
+#     # Index in Elasticsearch
+#     await sync_post(post_in_db.dict(by_alias=True))
+    
+#     return post_in_db
+async def create_post(post: PostCreate, user_id: str) -> PostInDB:
     db = await get_database()
     
-    post_in_db = PostInDB(
+    # Generate a new ObjectId for the post
+    post_id = ObjectId()
+    
+    # Prepare data for MongoDB (uses ObjectIds)
+    mongo_data = {
+        "_id": post_id,
+        "user_id": ObjectId(user_id),  # Convert to ObjectId for DB
         **post.dict(),
-        user_id=ObjectId(user_id),
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+        "likes": [],
+        "comments_count": 0,
+        "likes_count": 0
+    }
+    
+    # Insert into MongoDB
+    await db.social_posts.insert_one(mongo_data)
+    
+    # Create response model with string IDs
+    post_in_db = PostInDB(
+        id=(post_id),
+        user_id=ObjectId(user_id),  # Keep as original string
+        **post.dict(),
+        created_at=mongo_data["created_at"],
+        updated_at=mongo_data["updated_at"],
         likes=[],
-        comments=[],
-        likes_count=0,
-        comments_count=0
+        comments_count=0,
+        likes_count=0
     )
     
-    result = await db.posts.insert_one(post_in_db.dict(by_alias=True))
-    post_in_db.id = result.inserted_id
-    
-    # Index in Elasticsearch
     await sync_post(post_in_db.dict(by_alias=True))
-    
-    return post_in_db
+    return post_in_db.dict(by_alias=True)
 
 
 async def get_post_by_id(post_id: str) -> Optional[PostInDB]:
@@ -52,9 +87,9 @@ async def get_post_by_id(post_id: str) -> Optional[PostInDB]:
     """
     db = await get_database()
     
-    post_data = await db.posts.find_one({"_id": ObjectId(post_id)})
+    post_data = await db.social_posts.find_one({"_id": ObjectId(post_id)})
     if post_data:
-        return PostInDB(**post_data)
+        return PostInDB(**post_data).dict(by_alias=True)
     
     return None
 
@@ -79,7 +114,7 @@ async def update_post(post_id: str, post_update: PostUpdate) -> Optional[PostInD
     update_data["updated_at"] = datetime.utcnow()
     
     # Update the post
-    result = await db.posts.update_one(
+    result = await db.social_posts.update_one(
         {"_id": ObjectId(post_id)},
         {"$set": update_data}
     )
@@ -109,7 +144,7 @@ async def delete_post(post_id: str) -> bool:
     """
     db = await get_database()
     
-    result = await db.posts.delete_one({"_id": ObjectId(post_id)})
+    result = await db.social_posts.delete_one({"_id": ObjectId(post_id)})
     
     # Delete from Elasticsearch
     if result.deleted_count:
@@ -132,7 +167,7 @@ async def like_post(post_id: str, user_id: str) -> Optional[PostInDB]:
     db = await get_database()
     
     # Only add the like if the user hasn't already liked the post
-    result = await db.posts.update_one(
+    result = await db.social_posts.update_one(
         {
             "_id": ObjectId(post_id),
             "likes": {"$ne": ObjectId(user_id)}
@@ -173,7 +208,7 @@ async def unlike_post(post_id: str, user_id: str) -> Optional[PostInDB]:
     db = await get_database()
     
     # Only remove the like if the user has liked the post
-    result = await db.posts.update_one(
+    result = await db.social_posts.update_one(
         {
             "_id": ObjectId(post_id),
             "likes": ObjectId(user_id)
@@ -235,7 +270,7 @@ async def add_comment(post_id: str, comment: CommentCreate, user_id: str) -> Opt
     await db.comments.insert_one(comment_data)
     
     # Update post to increment comment count
-    await db.posts.update_one(
+    await db.social_posts.update_one(
         {"_id": ObjectId(post_id)},
         {
             "$inc": {"comments_count": 1},
@@ -500,7 +535,7 @@ async def get_social_feed(
         ]
     
     posts = []
-    cursor = db.posts.aggregate(pipeline)
+    cursor = db.social_posts.aggregate(pipeline)
     
     async for post in cursor:
         # Convert ObjectId to string
@@ -561,7 +596,7 @@ async def get_user_posts(
     ]
     
     posts = []
-    cursor = db.posts.aggregate(pipeline)
+    cursor = db.social_posts.aggregate(pipeline)
     
     async for post in cursor:
         # Convert ObjectId to string
