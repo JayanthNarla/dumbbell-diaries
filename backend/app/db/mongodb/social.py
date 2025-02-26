@@ -181,7 +181,7 @@ async def like_post(post_id: str, user_id: str) -> Optional[PostInDB]:
     
     if result.modified_count:
         # Get the updated post
-        updated_post = await get_post_by_id(post_id)
+        updated_post = await get_post_by_id((post_id))
         
         # Update in Elasticsearch
         if updated_post:
@@ -190,7 +190,7 @@ async def like_post(post_id: str, user_id: str) -> Optional[PostInDB]:
         return updated_post
     
     # Post might exist but user already liked it
-    existing_post = await get_post_by_id(post_id)
+    existing_post = await get_post_by_id((post_id))
     return existing_post
 
 
@@ -226,7 +226,7 @@ async def unlike_post(post_id: str, user_id: str) -> Optional[PostInDB]:
         
         # Update in Elasticsearch
         if updated_post:
-            await sync_post(updated_post.dict(by_alias=True), operation="update")
+            await sync_post(updated_post, operation="update")
             
         return updated_post
     
@@ -254,7 +254,7 @@ async def add_comment(post_id: str, comment: CommentCreate, user_id: str) -> Opt
         "_id": comment_id,
         "post_id": ObjectId(post_id),
         "user_id": ObjectId(user_id),
-        "content": comment.content,
+        "content": comment['content'],
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow(),
         "likes": [],
@@ -281,7 +281,7 @@ async def add_comment(post_id: str, comment: CommentCreate, user_id: str) -> Opt
     # Update in Elasticsearch
     post = await get_post_by_id(post_id)
     if post:
-        await sync_post(post.dict(by_alias=True), operation="update")
+        await sync_post(post, operation="update")
     
     # Convert ObjectId to string
     comment_data["_id"] = str(comment_data["_id"])

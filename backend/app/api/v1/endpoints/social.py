@@ -157,6 +157,7 @@ async def delete_post_endpoint(
         True if post was deleted
     """
     post = await get_post_by_id(post_id)
+    print(post)
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -164,7 +165,7 @@ async def delete_post_endpoint(
         )
     
     # Check if the post belongs to the current user
-    if str(post.user_id) != str(current_user.id):
+    if str(post['user_id']) != str(current_user.id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions",
@@ -203,7 +204,7 @@ async def like_post_endpoint(
             detail="Could not like post",
         )
     
-    return updated_post.dict(by_alias=True)
+    return updated_post
 
 
 @router.post("/posts/{post_id}/unlike", response_model=Dict)
@@ -235,7 +236,7 @@ async def unlike_post_endpoint(
             detail="Could not unlike post",
         )
     
-    return updated_post.dict(by_alias=True)
+    return updated_post
 
 
 @router.post("/posts/{post_id}/comments", response_model=Dict)
@@ -436,7 +437,7 @@ async def get_trending_workouts(
 @router.get("/search")
 async def search(
     q: str,
-    collection: str = "posts",
+    collection: str = "social_posts",
     skip: int = 0,
     limit: int = 20
 ):

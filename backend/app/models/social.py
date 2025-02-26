@@ -43,7 +43,7 @@ class PostInDB(PostBase, MongoBaseModel):
     user_id: PyObjectId  # Changed to PyObjectId type
     created_at: datetime
     updated_at: datetime
-    likes: List[str] = []
+    likes: List[PyObjectId] = []
     comments_count: int = 0
     likes_count: int = 0
    
